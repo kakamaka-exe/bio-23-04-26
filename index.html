@@ -23,11 +23,17 @@
   html { scroll-behavior: smooth; }
 
   body {
-    background: var(--parchment);
-    color: var(--ink);
-    font-family: 'DM Mono', monospace;
-    overflow-x: hidden;
-  }
+      background: var(--parchment);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      overflow-x: hidden;
+  
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;     
+      user-select: none;       
+    }
 
   .noise-overlay {
     position: fixed;
