@@ -1,591 +1,1217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evolution Theories</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thomas Malthus: Population and Power</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        :root {
-            --gold: #c9a84c;
-            --gold-light: #e8c97a;
-            --cream: #f5f0e8;
-            --deep: #0a0a0f;
-        }
+  :root {
+    --ink: #1a1208;
+    --parchment: #f5efe0;
+    --aged: #e8dcc8;
+    --rust: #b84a1e;
+    --gold: #c8922a;
+    --moss: #4a6741;
+    --slate: #3d4a5c;
+    --cream: #faf6ee;
+    --shadow: rgba(26,18,8,0.15);
+  }
 
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--deep);
-            color: var(--cream);
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
+  html { scroll-behavior: smooth; }
 
-        .bg-canvas {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-        }
+  body {
+    background: var(--parchment);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    overflow-x: hidden;
+  }
 
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(90px);
-            opacity: 0.55;
-            animation: orbDrift var(--dur, 18s) ease-in-out infinite alternate;
-        }
+  .noise-overlay {
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9990;
+    opacity: 0.6;
+  }
 
-        .orb-1 {
-            width: 700px; height: 700px;
-            background: radial-gradient(circle, #1a3a6e 0%, #0d1f3c 60%, transparent 100%);
-            top: -200px; left: -150px;
-            --dur: 20s;
-        }
-        .orb-2 {
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, #3d1e00 0%, #1a0d00 60%, transparent 100%);
-            bottom: -100px; right: -100px;
-            --dur: 25s;
-            animation-delay: -8s;
-        }
-        .orb-3 {
-            width: 400px; height: 400px;
-            background: radial-gradient(circle, #1e3a1e 0%, #0d1f0d 60%, transparent 100%);
-            top: 40%; left: 50%;
-            transform: translate(-50%, -50%);
-            --dur: 15s;
-            animation-delay: -4s;
-        }
-        .orb-4 {
-            width: 300px; height: 300px;
-            background: radial-gradient(circle, rgba(201,168,76,0.3) 0%, transparent 70%);
-            top: 20%; right: 20%;
-            --dur: 12s;
-            animation-delay: -2s;
-        }
+  header {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 6rem 8vw 4rem;
+    position: relative;
+    overflow: hidden;
+  }
 
-        @keyframes orbDrift {
-            0%   { transform: translate(0, 0) scale(1); }
-            33%  { transform: translate(40px, -60px) scale(1.08); }
-            66%  { transform: translate(-30px, 30px) scale(0.95); }
-            100% { transform: translate(60px, -20px) scale(1.05); }
-        }
+  .header-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 80% 50%, rgba(184,74,30,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 10% 80%, rgba(74,103,65,0.07) 0%, transparent 60%);
+  }
 
-        .grid-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            background-image:
-                linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
-            background-size: 80px 80px;
-            animation: gridShift 30s linear infinite;
-        }
+  .header-year {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(8rem, 18vw, 20rem);
+    font-weight: 500;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(26,18,8,0.12);
+    position: absolute;
+    right: -2vw;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 1;
+    pointer-events: none;
+    letter-spacing: -0.05em;
+  }
 
-        @keyframes gridShift {
-            0%   { background-position: 0 0; }
-            100% { background-position: 80px 80px; }
-        }
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
 
-        .particles {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-        }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 7vw, 7rem);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    max-width: 12ch;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.4s forwards;
+    position: relative;
+  }
 
-        .particle {
-            position: absolute;
-            width: 2px; height: 2px;
-            background: var(--gold);
-            border-radius: 50%;
-            opacity: 0;
-            animation: particleFloat var(--dur) ease-in-out infinite;
-            animation-delay: var(--delay);
-        }
+  h1 em {
+    font-style: italic;
+    color: var(--rust);
+    display: block;
+  }
 
-        @keyframes particleFloat {
-            0%   { opacity: 0; transform: translateY(0) translateX(0); }
-            10%  { opacity: 0.6; }
-            90%  { opacity: 0.3; }
-            100% { opacity: 0; transform: translateY(-120px) translateX(var(--drift, 30px)); }
-        }
+  .header-sub {
+    margin-top: 2rem;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    max-width: 36ch;
+    color: rgba(26,18,8,0.65);
+    opacity: 0;
+    animation: fadeUp 0.9s 0.6s forwards;
+  }
 
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 920px;
-            margin: 0 auto;
-            padding: 80px 30px 40px;
-        }
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 8vw;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(26,18,8,0.4);
+    opacity: 0;
+    animation: fadeUp 1s 1.2s forwards;
+  }
 
-        .page-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: clamp(3em, 7vw, 5.5em);
-            font-weight: 300;
-            text-align: center;
-            letter-spacing: 0.08em;
-            color: var(--cream);
-            margin-bottom: 12px;
-            opacity: 0;
-            animation: fadeDown 1s ease-out 0.2s forwards;
-        }
+  .scroll-line {
+    width: 40px; height: 1px;
+    background: var(--rust);
+    position: relative;
+    overflow: hidden;
+  }
+  .scroll-line::after {
+    content: '';
+    position: absolute;
+    left: -100%; top: 0;
+    width: 100%; height: 100%;
+    background: var(--ink);
+    animation: scanLine 2s 1.5s infinite;
+  }
 
-        .page-subtitle {
-            text-align: center;
-            font-size: 0.85em;
-            letter-spacing: 0.35em;
-            text-transform: uppercase;
-            color: var(--gold);
-            margin-bottom: 80px;
-            opacity: 0;
-            animation: fadeDown 1s ease-out 0.5s forwards;
-        }
+  @keyframes scanLine { to { left: 100%; } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-        @keyframes fadeDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 0 8vw;
+    opacity: 0.4;
+  }
 
-        .card {
-            position: relative;
-            border-radius: 28px;
-            padding: 48px 52px;
-            margin-bottom: 40px;
-            overflow: hidden;
-            opacity: 0;
-            transform: translateY(40px);
-            animation: riseIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  section {
+    padding: 5rem 8vw;
+    position: relative;
+  }
 
-            background:
-                linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 50%, rgba(255,255,255,0.03) 100%),
-                rgba(255, 250, 240, 0.03);
-            backdrop-filter: blur(32px) saturate(160%);
-            -webkit-backdrop-filter: blur(32px) saturate(160%);
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--rust);
+    opacity: 0.4;
+  }
 
-            border: 1px solid rgba(201,168,76,0.15);
-            box-shadow:
-                0 0 0 0.5px rgba(255,255,255,0.04) inset,
-                0 1px 0 rgba(255,255,255,0.12) inset,
-                0 -1px 0 rgba(0,0,0,0.3) inset,
-                1px 0 0 rgba(255,255,255,0.05) inset,
-                -1px 0 0 rgba(0,0,0,0.2) inset,
-                0 30px 80px rgba(0,0,0,0.5),
-                0 10px 30px rgba(0,0,0,0.3),
-                0 0 60px rgba(201,168,76,0.04);
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+  }
 
-            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                        box-shadow 0.5s ease,
-                        border-color 0.5s ease;
-        }
+  .bio-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: rgba(26,18,8,0.1);
+    border: 1px solid rgba(26,18,8,0.1);
+    margin-top: 3rem;
+  }
 
-        .card:nth-child(3) { animation-delay: 0.3s; }
-        .card:nth-child(4) { animation-delay: 0.5s; }
-        .card:nth-child(5) { animation-delay: 0.7s; }
+  .bio-card {
+    background: var(--cream);
+    padding: 2rem;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .bio-card:hover { background: var(--aged); }
+  .bio-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 3px; height: 0;
+    background: var(--rust);
+    transition: height 0.4s;
+  }
+  .bio-card:hover::before { height: 100%; }
 
-        .card::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 8%; right: 8%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25) 40%, rgba(201,168,76,0.3) 60%, transparent);
-            border-radius: 100%;
-            pointer-events: none;
-        }
+  .bio-card-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(26,18,8,0.4);
+    margin-bottom: 0.5rem;
+  }
+  .bio-card-value {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .bio-card-value.big {
+    font-size: 3rem;
+    font-weight: 300;
+    color: var(--rust);
+    line-height: 1;
+  }
 
-        .card:hover {
-            transform: translateY(-6px);
-        }
+  .theory-section { background: var(--ink); color: var(--parchment); }
+  .theory-section .section-label { color: var(--gold); }
+  .theory-section .section-label::after { background: var(--gold); }
+  .theory-section h2 { color: var(--parchment); }
 
-        @keyframes riseIn {
-            to { opacity: 1; transform: translateY(0); }
-        }
+  .math-visual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 3rem;
+  }
 
-        .section-number {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 0.75em;
-            font-weight: 300;
-            letter-spacing: 0.3em;
-            color: var(--gold);
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            display: block;
-        }
+  .math-block {
+    position: relative;
+  }
 
-        h2 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.8em;
-            font-weight: 400;
-            color: #ffffff;
-            letter-spacing: 0.02em;
-            margin-bottom: 28px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(201,168,76,0.15);
-        }
+  .math-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
 
-        h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.4em;
-            font-weight: 400;
-            color: var(--cream);
-            margin: 36px 0 16px;
-            letter-spacing: 0.03em;
-        }
+  .bars-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
-        p {
-            font-size: 0.95em;
-            line-height: 1.85;
-            color: rgba(245, 240, 232, 0.8);
-            font-weight: 300;
-        }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
 
-        .mindmap-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 40px;
-        }
+  .bar-label {
+    font-size: 0.7rem;
+    color: rgba(245,239,224,0.5);
+    width: 2.5rem;
+    text-align: right;
+    flex-shrink: 0;
+  }
 
-        .mindmap-root {
-            position: relative;
-            padding: 16px 36px;
-            background: linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.02) 100%);
-            border: 1px solid rgba(201,168,76,0.3);
-            border-radius: 40px;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.4em;
-            font-weight: 600;
-            color: var(--gold-light);
-            text-align: center;
-            letter-spacing: 0.04em;
-            box-shadow: 
-                0 8px 24px rgba(0,0,0,0.3), 
-                inset 0 1px 0 rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            margin-bottom: 40px; 
-            z-index: 2;
-        }
+  .bar-track {
+    flex: 1;
+    height: 20px;
+    background: rgba(245,239,224,0.05);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
 
-        .mindmap-root::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            width: 2px;
-            height: 20px;
-            background: var(--gold);
-            transform: translateX(-50%);
-            box-shadow: 0 0 8px rgba(201,168,76,0.6);
-        }
+  .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    width: 0;
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 
-        .mindmap-branches {
-            width: 100%;
-            position: relative;
-            z-index: 1;
-        }
+  .bar-fill.pop { background: linear-gradient(to right, var(--rust), #e05a2b); }
+  .bar-fill.food { background: linear-gradient(to right, var(--moss), #6a9460); }
 
-        @media (min-width: 800px) {
-            .mindmap-branches {
-                display: flex;
-                gap: 24px;
-            }
-            
-            .mindmap-branch {
-                flex: 1;
-                position: relative;
-            }
+  .bar-val {
+    font-size: 0.65rem;
+    color: rgba(245,239,224,0.4);
+    width: 2rem;
+    flex-shrink: 0;
+  }
 
-            .mindmap-branch::before {
-                content: '';
-                position: absolute;
-                top: -20px;
-                left: 50%;
-                width: 2px;
-                height: 20px;
-                background: var(--gold);
-                transform: translateX(-50%);
-                box-shadow: 0 0 8px rgba(201,168,76,0.6);
-            }
+  .theory-quote {
+    margin-top: 3rem;
+    border-left: 2px solid var(--rust);
+    padding-left: 2rem;
+  }
 
-            .mindmap-branch:not(:last-child)::after {
-                content: '';
-                position: absolute;
-                top: -20px;
-                left: 50%;
-                width: calc(100% + 24px); 
-                height: 2px;
-                background: var(--gold);
-                box-shadow: 0 0 8px rgba(201,168,76,0.6);
-            }
-        }
+  .theory-quote blockquote {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    font-style: italic;
+    line-height: 1.5;
+    color: rgba(245,239,224,0.85);
+  }
 
-        @media (max-width: 799px) {
-            .mindmap-branches {
-                display: flex;
-                flex-direction: column;
-                gap: 24px;
-            }
-            
-            .mindmap-branch {
-                width: 100%;
-                position: relative;
-            }
+  .theory-quote cite {
+    display: block;
+    margin-top: 1rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-style: normal;
+  }
 
-            .mindmap-branch:first-child::before {
-                content: '';
-                position: absolute;
-                top: -20px;
-                left: 50%;
-                width: 2px;
-                height: 20px;
-                background: var(--gold);
-                transform: translateX(-50%);
-                box-shadow: 0 0 8px rgba(201,168,76,0.6);
-            }
+  .tabs-section { background: var(--cream); }
 
-            .mindmap-branch:not(:first-child)::before {
-                content: '';
-                position: absolute;
-                top: -24px;
-                left: 50%;
-                width: 2px;
-                height: 24px;
-                background: var(--gold);
-                transform: translateX(-50%);
-                box-shadow: 0 0 8px rgba(201,168,76,0.6);
-            }
-        }
+  .tabs-nav {
+    display: flex;
+    gap: 0;
+    margin-bottom: 0;
+    border-bottom: 1px solid rgba(26,18,8,0.12);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs-nav::-webkit-scrollbar { display: none; }
 
-        .mindmap-node {
-            position: relative;
-            padding: 28px 32px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(201,168,76,0.12);
-            border-top-color: rgba(255,255,255,0.08);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 8px 24px rgba(0,0,0,0.25);
-            transition: all 0.35s ease;
-            overflow: hidden;
-            height: 100%;
-        }
+  .tab-btn {
+    padding: 1rem 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    color: rgba(26,18,8,0.45);
+    transition: color 0.25s, border-color 0.25s;
+    white-space: nowrap;
+    margin-bottom: -1px;
+  }
+  .tab-btn.active {
+    color: var(--rust);
+    border-bottom-color: var(--rust);
+  }
+  .tab-btn:hover { color: var(--ink); }
 
-        .mindmap-node::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 10%; bottom: 10%;
-            width: 3px;
-            background: linear-gradient(180deg, transparent, var(--gold), transparent);
-            border-radius: 0 2px 2px 0;
-        }
+  .tab-content { display: none; padding-top: 2.5rem; }
+  .tab-content.active { display: block; }
 
-        .mindmap-node:hover {
-            background: rgba(255,255,255,0.065);
-            border-color: rgba(201,168,76,0.4);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 12px 32px rgba(0,0,0,0.4), 0 0 15px rgba(201,168,76,0.15);
-        }
+  .tab-content p {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    line-height: 1.8;
+    color: rgba(26,18,8,0.8);
+    max-width: 70ch;
+  }
 
-        .mindmap-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.15em;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 12px;
-            letter-spacing: 0.04em;
-        }
+  .tab-content p + p { margin-top: 1.2rem; }
 
-        .mindmap-node p {
-            font-size: 0.88em;
-            margin: 0;
-        }
+  .reactions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
 
-        .table-wrap {
-            margin-top: 28px;
-            border-radius: 18px;
-            overflow: hidden;
-            background: rgba(0,0,0,0.25);
-            border: 1px solid rgba(201,168,76,0.1);
-            backdrop-filter: blur(8px);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-        }
+  .reaction-card {
+    border: 1px solid rgba(26,18,8,0.1);
+    padding: 1.5rem;
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+    background: var(--parchment);
+  }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+  .reaction-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px var(--shadow);
+  }
 
-        th {
-            padding: 18px 24px;
-            text-align: left;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.72em;
-            font-weight: 500;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: var(--gold-light);
-            background: rgba(201,168,76,0.06);
-            border-bottom: 1px solid rgba(201,168,76,0.12);
-        }
+  .reaction-person {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
 
-        td {
-            padding: 20px 24px;
-            font-size: 0.88em;
-            line-height: 1.7;
-            color: rgba(245,240,232,0.75);
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            vertical-align: top;
-            font-weight: 300;
-            transition: background 0.2s ease;
-        }
+  .reaction-stance {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border-radius: 2px;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+  .reaction-stance.support { background: rgba(74,103,65,0.15); color: var(--moss); }
+  .reaction-stance.oppose { background: rgba(184,74,30,0.12); color: var(--rust); }
+  .reaction-stance.inspired { background: rgba(200,146,42,0.15); color: var(--gold); }
 
-        td:first-child {
-            color: var(--cream);
-            font-weight: 400;
-        }
+  .reaction-text {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: rgba(26,18,8,0.65);
+  }
 
-        tr:last-child td { border-bottom: none; }
+  .timeline-section { overflow: hidden; }
 
-        tr:hover td {
-            background: rgba(255,255,255,0.025);
-        }
+  .timeline {
+    position: relative;
+    margin-top: 3rem;
+    padding-left: 3rem;
+  }
 
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
-            margin: 32px 0;
-        }
-        .footer {
-            text-align: center;
-            padding: 20px 0 0;
-            font-size: 0.75em;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: rgba(201,168,76,0.45);
-            font-weight: 300;
-        }
-    </style>
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--rust), transparent);
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-bottom: 3rem;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.6s, transform 0.6s;
+  }
+
+  .timeline-item.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: -3.375rem;
+    top: 0.2rem;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--rust);
+    border: 2px solid var(--parchment);
+    box-shadow: 0 0 0 1px var(--rust);
+  }
+
+  .timeline-year {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--rust);
+    margin-bottom: 0.4rem;
+  }
+
+  .timeline-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-desc {
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: rgba(26,18,8,0.65);
+    max-width: 55ch;
+  }
+
+  .counter-section { background: var(--slate); color: var(--parchment); }
+  .counter-section h2 { color: var(--parchment); }
+  .counter-section .section-label { color: #a8c0d8; }
+  .counter-section .section-label::after { background: #a8c0d8; }
+
+  .counter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2px;
+    background: rgba(245,239,224,0.08);
+    margin-top: 3rem;
+  }
+
+  .counter-cell {
+    background: var(--slate);
+    padding: 2.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .counter-cell:hover { background: #495a6e; }
+
+  .counter-num {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
+    color: var(--parchment);
+    line-height: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 0.2rem;
+  }
+  .counter-num sup {
+    font-size: 0.4em;
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-weight: 400;
+  }
+
+  .counter-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,239,224,0.45);
+    margin-top: 0.6rem;
+    line-height: 1.4;
+  }
+
+  .counter-accent {
+    position: absolute;
+    bottom: -10px; right: -10px;
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    color: rgba(245,239,224,0.03);
+    font-weight: 900;
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  .discussion-section { background: var(--parchment); }
+
+  .discussion-text {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1rem, 1.8vw, 1.15rem);
+    line-height: 1.9;
+    color: rgba(26,18,8,0.82);
+    max-width: 72ch;
+  }
+
+  .discussion-text p + p { margin-top: 1.5rem; }
+
+  .highlight-box {
+    border: 1px solid rgba(26,18,8,0.1);
+    border-left: 3px solid var(--rust);
+    padding: 1.5rem 2rem;
+    margin: 2.5rem 0;
+    background: rgba(184,74,30,0.04);
+  }
+
+  .highlight-box p {
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  .sources-section {
+    background: var(--ink);
+    color: var(--parchment);
+    padding: 4rem 8vw;
+  }
+
+  .sources-list {
+    list-style: none;
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .sources-list li {
+    font-size: 0.75rem;
+    color: rgba(245,239,224,0.4);
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+  }
+
+  .sources-list li::before {
+    content: '—';
+    color: var(--rust);
+    flex-shrink: 0;
+  }
+
+  .sources-list a {
+    color: var(--gold);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .sources-list a:hover { color: var(--parchment); }
+
+  footer {
+    background: var(--ink);
+    border-top: 1px solid rgba(245,239,224,0.06);
+    padding: 2rem 8vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-credit {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,239,224,0.3);
+  }
+  .footer-credit strong {
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  .quiz-section { background: var(--aged); }
+
+  .quiz-box {
+    background: var(--cream);
+    border: 1px solid rgba(26,18,8,0.1);
+    padding: 2.5rem;
+    max-width: 640px;
+    margin-top: 2rem;
+  }
+
+  .quiz-question {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .quiz-option {
+    padding: 0.9rem 1.2rem;
+    border: 1px solid rgba(26,18,8,0.15);
+    background: var(--parchment);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quiz-option:hover { background: var(--aged); border-color: var(--rust); }
+  .quiz-option.correct { background: rgba(74,103,65,0.15); border-color: var(--moss); color: var(--moss); }
+  .quiz-option.wrong { background: rgba(184,74,30,0.1); border-color: var(--rust); color: var(--rust); }
+
+  .quiz-feedback {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: rgba(26,18,8,0.7);
+    min-height: 2.5rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .quiz-nav {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 0.7rem 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--parchment);
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .btn:hover { background: var(--rust); border-color: var(--rust); }
+  .btn.outline { background: transparent; color: var(--ink); }
+  .btn.outline:hover { background: var(--ink); color: var(--parchment); }
+
+  .quiz-progress {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: rgba(26,18,8,0.4);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .score-display {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--rust);
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .bio-grid { grid-template-columns: 1fr; }
+    .math-visual { grid-template-columns: 1fr; }
+    header { padding: 4rem 5vw 3rem; }
+    section { padding: 3.5rem 5vw; }
+    .header-year { font-size: 30vw; }
+  }
+
+  .fade-in-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: var(--rust);
+    z-index: 9997;
+    transition: width 0.1s linear;
+  }
+</style>
 </head>
 <body>
 
-    <div class="bg-canvas">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-        <div class="orb orb-4"></div>
+<div class="noise-overlay"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<header>
+  <div class="header-bg"></div>
+  <div class="header-year">1798</div>
+  <div class="eyebrow">Political Economy · Population Theory</div>
+  <h1>Thomas<br><em>Malthus</em></h1>
+  <p class="header-sub">An exploration of the man who predicted humanity's doom, and why he was both profoundly influential and ultimately wrong.</p>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll to explore
+  </div>
+</header>
+
+<div class="divider"></div>
+
+<section class="fade-in-up">
+  <div class="section-label">01 / Who Was He?</div>
+  <div style="display:flex; gap:3rem; align-items:flex-start; flex-wrap:wrap;">
+    <div style="flex:1; min-width:220px;">
+      <h2>The First Professor of<br>Political Economy</h2>
     </div>
-    <div class="grid-overlay"></div>
-    <div class="particles" id="particles"></div>
-
-    <div class="container">
-        <h1 class="page-title">Evolution Theories</h1>
-        <p class="page-subtitle">A Study of Natural Science and Darwin's Legacy</p>
-
-        <div class="card">
-            <span class="section-number">01, Foundation</span>
-            <h2>Explain the statement: Evolution is 'just' a theory</h2>
-            <p>In everyday life, a "theory" is usually just a guess. But in science, a theory is a tested explanation with a lot of proof behind it. Saying evolution is "just" a theory is wrong, because it is one of the most tested ideas in science.</p>
-        </div>
-
-        <div class="card">
-            <span class="section-number">02, Context</span>
-            <h2>Illustrate the influences that reinforced Charles Darwin's path to his theory</h2>
-            <p>Darwin did not create his theory by himself. Other scientists gave him important ideas.</p>
-
-            <div class="mindmap-wrapper">
-                <div class="mindmap-root">Darwin's Theory of Evolution</div>
-                
-                <div class="mindmap-branches">
-                    <div class="mindmap-branch">
-                        <div class="mindmap-node">
-                            <div class="mindmap-title">Geology & Deep Time</div>
-                            <p>James Hutton and Charles Lyell showed that the Earth changes very slowly over millions of years. This made Darwin realize the Earth is extremely old. This gave enough time for living things to slowly change.</p>
-                        </div>
-                    </div>
-
-                    <div class="mindmap-branch">
-                        <div class="mindmap-node">
-                            <div class="mindmap-title">Populations & Competition</div>
-                            <p>Thomas Malthus said there are always more people than food, so people have to compete to live. Darwin used this idea for plants and animals. He saw that competing helps decide which ones survive and have babies.</p>
-                        </div>
-                    </div>
-
-                    <div class="mindmap-branch">
-                        <div class="mindmap-node">
-                            <div class="mindmap-title">Fossils & Paleontology</div>
-                            <p>Georges Cuvier found fossils in old rocks. These fossils were from animals that do not exist anymore. This proved to Darwin that life on Earth changes over time.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <span class="section-number">03, Comparison</span>
-            <h2>Compare the theories of Lamarck and Darwin</h2>
-
-            <div class="table-wrap">
-                <table>
-                    <tr>
-                        <th>Feature</th>
-                        <th>Lamarck's Theory</th>
-                        <th>Darwin's Theory</th>
-                    </tr>
-                    <tr>
-                        <td>How Change Happens</td>
-                        <td>Using a body part makes it stronger. Not using it makes it shrink.</td>
-                        <td>Some animals are born with helpful traits. This makes them more likely to survive and have babies.</td>
-                    </tr>
-                    <tr>
-                        <td>The Giraffe Example</td>
-                        <td>Giraffes stretched their necks to reach high leaves. Over time, their necks grew longer.</td>
-                        <td>Giraffes born with longer necks reached more food. They survived and had more babies with long necks.</td>
-                    </tr>
-                    <tr>
-                        <td>What Gets Passed On</td>
-                        <td>Changes made during an animal's life are passed to its babies.</td>
-                        <td>Only traits in the animal's DNA can be passed to its babies.</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="divider"></div>
-
-            <h3>Explain what led to Darwin's theory being accepted, while Lamarck's theory of evolution was rejected</h3>
-            <p>Scientists rejected Lamarck's idea. Getting strong muscles from working hard during your life does not change your DNA, so your babies will not be born with strong muscles. Darwin's idea was accepted because it matches how genes and DNA actually work.</p>
-        </div>
-        <footer class="footer">Made by Angelo &nbsp;·&nbsp; 04/03/2026</footer>
+    <div style="flex-shrink:0;">
+      <div style="border:1px solid rgba(26,18,8,0.12); padding:8px; background:var(--cream); box-shadow:4px 4px 0 rgba(26,18,8,0.08);">
+        <img src="https://www.meisterdrucke.com/kunstwerke/1260px/John_Linnell_-_Portrait_of_Thomas_Robert_Malthus_1766-1834_-_%28MeisterDrucke-708588%29.jpg"
+             alt="Portrait of Thomas Robert Malthus by John Linnell"
+             style="display:block; width:200px; height:auto; filter:sepia(20%) contrast(1.05);">
+        <div style="font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(26,18,8,0.35); margin-top:6px; text-align:center; font-family:'DM Mono',monospace;">Portrait by John Linnell, c. 1833</div>
+      </div>
     </div>
+  </div>
+  <div class="bio-grid" style="margin-top:2rem;">
+    <div class="bio-card">
+      <div class="bio-card-label">Born</div>
+      <div class="bio-card-value big">1766</div>
+    </div>
+    <div class="bio-card">
+      <div class="bio-card-label">Nationality</div>
+      <div class="bio-card-value">English</div>
+    </div>
+    <div class="bio-card">
+      <div class="bio-card-label">Occupation</div>
+      <div class="bio-card-value">Church Leader & Economist</div>
+    </div>
+    <div class="bio-card">
+      <div class="bio-card-label">Famous Work</div>
+      <div class="bio-card-value">An Essay on the<br>Principle of Population</div>
+    </div>
+    <div class="bio-card">
+      <div class="bio-card-label">Published</div>
+      <div class="bio-card-value big" style="color:var(--gold)">1798</div>
+    </div>
+    <div class="bio-card">
+      <div class="bio-card-label">Core Claim</div>
+      <div class="bio-card-value">Some people must inevitably suffer from hunger and poverty</div>
+    </div>
+  </div>
+</section>
 
-    <script>
-        const container = document.getElementById('particles');
-        for (let i = 0; i < 55; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            const size = Math.random() > 0.7 ? 3 : 2;
-            p.style.cssText = `
-                left: ${Math.random() * 100}%;
-                top: ${Math.random() * 100}%;
-                width: ${size}px;
-                height: ${size}px;
-                --dur: ${6 + Math.random() * 12}s;
-                --delay: ${Math.random() * -20}s;
-                --drift: ${(Math.random() - 0.5) * 80}px;
-            `;
-            container.appendChild(p);
-        }
+<div class="divider"></div>
 
-        document.addEventListener('mousemove', (e) => {
-            const cx = (e.clientX / window.innerWidth - 0.5) * 2;
-            const cy = (e.clientY / window.innerHeight - 0.5) * 2;
-            document.querySelectorAll('.orb').forEach((orb, i) => {
-                const depth = (i + 1) * 10;
-                orb.style.transform = `translate(${cx * depth}px, ${cy * depth}px)`;
-            });
-        });
-    </script>
+<section class="theory-section fade-in-up">
+  <div class="section-label">02 / The Theory</div>
+  <h2>Population vs.<br>Food Production</h2>
+
+  <div class="math-visual">
+    <div class="math-block">
+      <div class="math-title">Population Growth (×2 each period)</div>
+      <div class="bars-container" id="popBars"></div>
+    </div>
+    <div class="math-block">
+      <div class="math-title">Food Production (+1 each period)</div>
+      <div class="bars-container" id="foodBars"></div>
+    </div>
+  </div>
+
+  <div class="theory-quote">
+    <blockquote>
+      "Population, when unchecked, increases in a geometrical ratio. Subsistence increases only in an arithmetical ratio."
+    </blockquote>
+    <cite>Thomas Malthus, 1798</cite>
+  </div>
+
+  <div style="margin-top:2.5rem; font-size:0.82rem; line-height:1.8; color:rgba(245,239,224,0.55); max-width:65ch;">
+    Malthus believed natural disasters, diseases, and famines were nature's way of correcting overpopulation. He also argued that people should marry late and delay having children. Crucially, he did not use the scientific method; he treated his formula as self-evident, inspired by history and older philosophers like Plato.
+  </div>
+</section>
+
+<section class="tabs-section fade-in-up">
+  <div class="section-label">03 / Evidence and Reception</div>
+  <h2>How His Theory<br>Was Received</h2>
+
+  <div class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab('evidence')">Evidence Used</button>
+    <button class="tab-btn" onclick="switchTab('reactions')">Reactions</button>
+    <button class="tab-btn" onclick="switchTab('consequences')">Real Consequences</button>
+    <button class="tab-btn" onclick="switchTab('context')">Historical Context</button>
+  </div>
+
+  <div id="tab-evidence" class="tab-content active">
+    <p>Malthus supported his theory through several types of historical evidence. He pointed to mass migrations throughout history that were caused by overpopulation, with entire peoples forced to move when their land could no longer feed them.</p>
+    <p>He also observed the division and sub-division of farms in Central Europe, where plots grew smaller with each generation as parents split land among their children. Closer to home, his own parents had seven children, a vivid personal example of the population pressure he was describing.</p>
+  </div>
+
+  <div id="tab-reactions" class="tab-content">
+    <div class="reactions-grid">
+      <div class="reaction-card">
+        <div class="reaction-person">Charles Darwin</div>
+        <span class="reaction-stance inspired">Inspired</span>
+        <div class="reaction-text">Used Malthus's ideas about population pressure and limited resources as a key inspiration for his theory of natural selection and evolution.</div>
+      </div>
+      <div class="reaction-card">
+        <div class="reaction-person">Karl Marx</div>
+        <span class="reaction-stance oppose">Opposed</span>
+        <div class="reaction-text">Alongside Engels, Marx criticised Malthus for lacking scientific proof and for using his theory to justify the suffering of the working class.</div>
+      </div>
+      <div class="reaction-card">
+        <div class="reaction-person">David Ricardo</div>
+        <span class="reaction-stance oppose">Sceptical</span>
+        <div class="reaction-text">The famous economist questioned the scientific basis of Malthus's mathematical relationships between population and food supply.</div>
+      </div>
+      <div class="reaction-card">
+        <div class="reaction-person">Charles Dickens</div>
+        <span class="reaction-stance oppose">Satirised</span>
+        <div class="reaction-text">The novelist was said to have based the miserly Ebenezer Scrooge (A Christmas Carol) partly on Malthus's cold, strict views about the poor.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-consequences" class="tab-content">
+    <p>The real-world consequences of Malthusian thinking were severe. During the Irish Famine of the 1840s, the British government provided minimal aid, a decision heavily influenced by the belief that mass starvation was a natural, even necessary, correction of overpopulation.</p>
+    <p>This led to catastrophic mass starvation and triggered one of the largest waves of emigration in Irish history, with millions forced to leave for America. Malthus's theories provided an intellectual justification for political inaction in the face of humanitarian disaster.</p>
+  </div>
+
+  <div id="tab-context" class="tab-content">
+    <p>At the start to mid-19th century, England experienced extremely high birth rates while death rates dropped sharply, the result of of improved medicine and cleaner living conditions. This created a massive population boom that seemed to confirm Malthus's fears.</p>
+    <p>Europe's broader response to resource scarcity was colonial expansion: shipping large numbers of people to the Americas and other overseas territories. The full title of Malthus's work reflects his concern: <em>"An Essay on the Principle of Population, as it affects the future improvement of society."</em></p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="timeline-section fade-in-up">
+  <div class="section-label">04 / Key Events</div>
+  <h2>A Theory's Legacy<br>Through Time</h2>
+
+  <div class="timeline" id="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1766</div>
+      <div class="timeline-title">Thomas Malthus is Born</div>
+      <div class="timeline-desc">Born in England, Malthus would grow up to become the world's first professor of political economy and an Anglican clergyman.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1798</div>
+      <div class="timeline-title">Essay on Population Published</div>
+      <div class="timeline-desc">His landmark work argues population grows geometrically while food supplies grow arithmetically, making poverty and famine inevitable.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1840s</div>
+      <div class="timeline-title">The Irish Famine</div>
+      <div class="timeline-desc">The British government's Malthus-influenced refusal to provide adequate relief leads to mass starvation and the emigration of millions to America.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1840s</div>
+      <div class="timeline-title">Darwin's Theory of Evolution</div>
+      <div class="timeline-desc">Charles Darwin credits Malthus's ideas about population pressure as a key inspiration for his theory of natural selection.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1800s</div>
+      <div class="timeline-title">Justus von Liebig's Discovery</div>
+      <div class="timeline-desc">The invention of artificial fertilizer begins to shatter the assumption that food production cannot keep pace with population growth.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1960s–70s</div>
+      <div class="timeline-title">The Green Revolution</div>
+      <div class="timeline-desc">New high-yield seeds, pesticides, and mechanisation transform global agriculture. Food production vastly outpaces even Malthus's worst predictions.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">20th Century</div>
+      <div class="timeline-title">Neo-Malthusianism</div>
+      <div class="timeline-desc">Environmentalists revive Malthus's warnings about overpopulation and resource depletion, but they again fail to anticipate technological solutions.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">Early 2000s</div>
+      <div class="timeline-title">GMO Protests</div>
+      <div class="timeline-desc">Demonstrations erupt worldwide against large agricultural corporations and the spread of genetically modified crops controlling the food supply.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2015</div>
+      <div class="timeline-title">UN Halves World Hunger</div>
+      <div class="timeline-desc">The United Nations achieves its Millennium Development Goal of cutting extreme hunger in half, even as the world population surpasses 7 billion.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2022</div>
+      <div class="timeline-title">8 Billion People</div>
+      <div class="timeline-desc">The world's population reaches 8 billion, yet global extreme poverty rates have fallen dramatically from Malthus's era, the opposite of his predictions.</div>
+    </div>
+  </div>
+</section>
+
+<section class="counter-section fade-in-up">
+  <div class="section-label">05 / By the Numbers</div>
+  <h2>Malthus in Numbers</h2>
+  <div class="counter-grid">
+    <div class="counter-cell">
+      <div class="counter-num"><span class="count-up" data-target="1766">0</span></div>
+      <div class="counter-label">Year Malthus was born</div>
+      <div class="counter-accent">①</div>
+    </div>
+    <div class="counter-cell">
+      <div class="counter-num"><span class="count-up" data-target="8">0</span><sup>billion</sup></div>
+      <div class="counter-label">World population today</div>
+      <div class="counter-accent">②</div>
+    </div>
+    <div class="counter-cell">
+      <div class="counter-num"><span class="count-up" data-target="7">0</span></div>
+      <div class="counter-label">Children in Malthus's own family</div>
+      <div class="counter-accent">③</div>
+    </div>
+    <div class="counter-cell">
+      <div class="counter-num"><span class="count-up" data-target="1798">0</span></div>
+      <div class="counter-label">Year Essay on Population published</div>
+      <div class="counter-accent">④</div>
+    </div>
+  </div>
+</section>
+
+<section class="discussion-section fade-in-up">
+  <div class="section-label">06 / Discussion</div>
+  <h2>Was Malthus<br>Right or Wrong?</h2>
+  <div class="discussion-text">
+    <p>In 2026, Thomas Malthus's main idea is mostly wrong on a global level. His prediction that population growth would always outpace food production, leading to mass starvation, has not come to pass, thanks largely to human ingenuity.</p>
+    <div class="highlight-box">
+      <p>The Green Revolution of the 20th century, with its new seeds, chemical fertilisers, and advanced machinery, allowed food production to keep pace with a world population that has now surpassed 8 billion people.</p>
+    </div>
+    <p>The United Nations achieved its goal of cutting world hunger in half by 2015, even as the global population continued to grow. Birth rates have also fallen dramatically in most countries due to better education and access to contraception. Global extreme poverty has actually declined since Malthus's era, the opposite of what he predicted.</p>
+    <p>Malthus fundamentally did not believe enough in human creativity. His dark view that poverty is a natural, unavoidable law is too pessimistic. However, his warnings are not entirely useless. In some regions, particularly parts of Africa, rapid population growth still places heavy pressure on local resources. Modern concerns about climate change and environmental degradation echo his fundamental insight that Earth has limits.</p>
+    <p>We avoided a global Malthusian catastrophe through technology. But his thesis remains a useful reminder: we must continue to farm in smart, sustainable ways to ensure food security in 2026 and beyond.</p>
+  </div>
+</section>
+
+<section class="quiz-section fade-in-up">
+  <div class="section-label">07 / Test Yourself</div>
+  <h2>Quick Knowledge<br>Check</h2>
+
+  <div class="quiz-box">
+    <div id="quizArea">
+      <div class="quiz-question" id="quizQuestion"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <div class="quiz-nav">
+        <button class="btn" id="nextBtn" onclick="nextQuestion()" style="display:none">Next →</button>
+        <span class="quiz-progress" id="quizProgress"></span>
+      </div>
+      <div class="score-display" id="scoreDisplay"></div>
+    </div>
+  </div>
+</section>
+
+<section class="sources-section">
+  <div class="section-label" style="color:#a8c0d8;">08 / Sources</div>
+  <ul class="sources-list">
+    <li>Investopedia: <a href="https://www.investopedia.com/terms/t/thomas-malthus.asp" target="_blank">Who Was Thomas Malthus? What Is the Malthusian Growth Model?</a></li>
+    <li>United Nations (2015): <a href="https://www.un.org/millenniumgoals/2015_MDG_Report/pdf/MDG%202015%20rev%20(July%201).pdf" target="_blank">The Millennium Development Goals Report 2015</a></li>
+    <li>United Nations: <a href="https://www.un.org/en/dayof8billion" target="_blank">Day of 8 Billion</a></li>
+    <li>Welt: <a href="https://www.welt.de/geschichte/article152151477/Malthus-Ein-Teil-der-Menschheit-muss-Hunger-leiden.html" target="_blank">Malthus: "Ein Teil der Menschheit muss Hunger leiden"</a></li>
+    <li>World Bank: <a href="https://pip.worldbank.org/" target="_blank">Poverty and Inequality Platform (Global Extreme Poverty Rates)</a></li>
+  </ul>
+</section>
+
+<footer>
+  <div class="footer-credit">Made by <strong>Angelo</strong></div>
+  <div class="footer-credit">23 / 04 / 2026</div>
+</footer>
+
+<script>
+(function() {
+  const pb = document.getElementById('progressBar');
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+    pb.style.width = pct + '%';
+  });
+
+  const popData = [1,2,4,8,16,32];
+  const foodData = [1,2,3,4,5,6];
+  const maxPop = 32;
+
+  function renderBars() {
+    const popCont = document.getElementById('popBars');
+    const foodCont = document.getElementById('foodBars');
+    popData.forEach((v,i) => {
+      popCont.innerHTML += `<div class="bar-row"><div class="bar-label">${v}</div><div class="bar-track"><div class="bar-fill pop" data-w="${(v/maxPop)*100}" style="width:0"></div></div><div class="bar-val">×${Math.pow(2,i) > 1 ? Math.pow(2,i) : ''}</div></div>`;
+    });
+    foodData.forEach((v,i) => {
+      foodCont.innerHTML += `<div class="bar-row"><div class="bar-label">${v}</div><div class="bar-track"><div class="bar-fill food" data-w="${(v/maxPop)*100}" style="width:0"></div></div><div class="bar-val">+${i > 0 ? 1 : ''}</div></div>`;
+    });
+  }
+  renderBars();
+
+  let barsAnimated = false;
+  function animateBars() {
+    if (barsAnimated) return;
+    const fills = document.querySelectorAll('.bar-fill');
+    fills.forEach((f, i) => {
+      setTimeout(() => { f.style.width = f.dataset.w + '%'; }, i * 120);
+    });
+    barsAnimated = true;
+  }
+
+  let countersAnimated = false;
+  function animateCounters() {
+    if (countersAnimated) return;
+    document.querySelectorAll('.count-up').forEach(el => {
+      const target = +el.dataset.target;
+      const duration = 1400;
+      const start = performance.now();
+      function step(now) {
+        const p = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(ease * target);
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+    countersAnimated = true;
+  }
+
+  const timelineItems = document.querySelectorAll('.timeline-item');
+  function checkTimeline() {
+    timelineItems.forEach((item, i) => {
+      const rect = item.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.85) {
+        setTimeout(() => item.classList.add('visible'), i * 80);
+      }
+    });
+  }
+
+  const fadeEls = document.querySelectorAll('.fade-in-up');
+  function checkFades() {
+    fadeEls.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.88) el.classList.add('visible');
+    });
+  }
+
+  function checkBars() {
+    const sec = document.querySelector('.theory-section');
+    if (!sec) return;
+    const rect = sec.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.7) animateBars();
+  }
+
+  function checkCounters() {
+    const sec = document.querySelector('.counter-section');
+    if (!sec) return;
+    const rect = sec.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.8) animateCounters();
+  }
+
+  window.addEventListener('scroll', () => {
+    checkFades();
+    checkTimeline();
+    checkBars();
+    checkCounters();
+  });
+  checkFades();
+  checkTimeline();
+
+  window.switchTab = function(id) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    event.target.classList.add('active');
+  };
+
+  const questions = [
+    {
+      q: "What was Thomas Malthus's profession?",
+      opts: ["Philosopher & Mathematician","Church Leader & Political Economist","Military Strategist","Physician"],
+      ans: 1,
+      fb: "Correct! Malthus was an Anglican clergyman and the world's first professor of political economy."
+    },
+    {
+      q: "According to Malthus, how does population grow?",
+      opts: ["By adding (1, 2, 3, 4...)","By multiplying (1, 2, 4, 8...)","At a constant steady rate","Slower than food production"],
+      ans: 1,
+      fb: "Exactly right. Malthus argued population grows geometrically (multiplying), while food grows arithmetically (adding)."
+    },
+    {
+      q: "What event was heavily influenced by Malthusian thinking?",
+      opts: ["The French Revolution","The American Civil War","The Irish Famine","World War I"],
+      ans: 2,
+      fb: "Correct. The British government's minimal response to the Irish Famine was influenced by Malthus's view that starvation was a natural population correction."
+    },
+    {
+      q: "Which famous author based a character on Malthus's cold views?",
+      opts: ["Jane Austen","Charles Dickens","William Thackeray","Thomas Hardy"],
+      ans: 1,
+      fb: "That's right! Charles Dickens is said to have based the miserly Ebenezer Scrooge on Malthus's strict views about the poor."
+    },
+    {
+      q: "What development most directly challenged Malthus's theory?",
+      opts: ["The Industrial Revolution","Colonial expansion","The Green Revolution & artificial fertiliser","The discovery of America"],
+      ans: 2,
+      fb: "Correct. Justus von Liebig's invention of artificial fertiliser and later the Green Revolution dramatically increased food production beyond what Malthus thought possible."
+    }
+  ];
+
+  let current = 0, score = 0, answered = false;
+
+  function loadQuestion() {
+    answered = false;
+    const q = questions[current];
+    document.getElementById('quizQuestion').textContent = q.q;
+    document.getElementById('quizFeedback').textContent = '';
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('quizProgress').textContent = `Question ${current + 1} of ${questions.length}`;
+    const optsEl = document.getElementById('quizOptions');
+    optsEl.innerHTML = '';
+    q.opts.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-option';
+      btn.textContent = opt;
+      btn.onclick = () => selectAnswer(i);
+      optsEl.appendChild(btn);
+    });
+  }
+
+  window.selectAnswer = function(idx) {
+    if (answered) return;
+    answered = true;
+    const q = questions[current];
+    const btns = document.querySelectorAll('.quiz-option');
+    btns[idx].classList.add(idx === q.ans ? 'correct' : 'wrong');
+    if (idx !== q.ans) btns[q.ans].classList.add('correct');
+    if (idx === q.ans) score++;
+    document.getElementById('quizFeedback').textContent = idx === q.ans ? '✓ ' + q.fb : '✗ ' + q.fb;
+    document.getElementById('nextBtn').style.display = current < questions.length - 1 ? 'block' : 'none';
+    if (current === questions.length - 1) {
+      setTimeout(() => {
+        document.getElementById('quizProgress').textContent = '';
+        document.getElementById('nextBtn').style.display = 'none';
+        const sd = document.getElementById('scoreDisplay');
+        sd.style.display = 'block';
+        sd.textContent = `Score: ${score} / ${questions.length}`;
+      }, 1000);
+    }
+  };
+
+  window.nextQuestion = function() {
+    current++;
+    if (current < questions.length) loadQuestion();
+  };
+
+  loadQuestion();
+})();
+</script>
 </body>
 </html>
