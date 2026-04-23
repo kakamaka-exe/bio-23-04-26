@@ -1136,31 +1136,31 @@
       q: "What was Thomas Malthus's profession?",
       opts: ["Philosopher & Mathematician","Church Leader & Political Economist","Military Strategist","Physician"],
       ans: 1,
-      fb: "Correct! Malthus was an Anglican clergyman and the world's first professor of political economy."
+      fb: "Malthus was an Anglican clergyman and the world's first professor of political economy."
     },
     {
       q: "According to Malthus, how does population grow?",
       opts: ["By adding (1, 2, 3, 4...)","By multiplying (1, 2, 4, 8...)","At a constant steady rate","Slower than food production"],
       ans: 1,
-      fb: "Exactly right. Malthus argued population grows geometrically (multiplying), while food grows arithmetically (adding)."
+      fb: "Malthus argued population grows geometrically (multiplying), while food grows arithmetically (adding)."
     },
     {
       q: "What event was heavily influenced by Malthusian thinking?",
       opts: ["The French Revolution","The American Civil War","The Irish Famine","World War I"],
       ans: 2,
-      fb: "Correct. The British government's minimal response to the Irish Famine was influenced by Malthus's view that starvation was a natural population correction."
+      fb: "The British government's minimal response to the Irish Famine was influenced by Malthus's view that starvation was a natural population correction."
     },
     {
       q: "Which famous author based a character on Malthus's cold views?",
       opts: ["Jane Austen","Charles Dickens","William Thackeray","Thomas Hardy"],
       ans: 1,
-      fb: "That's right! Charles Dickens is said to have based the miserly Ebenezer Scrooge on Malthus's strict views about the poor."
+      fb: "Charles Dickens is said to have based the miserly Ebenezer Scrooge on Malthus's strict views about the poor."
     },
     {
       q: "What development most directly challenged Malthus's theory?",
       opts: ["The Industrial Revolution","Colonial expansion","The Green Revolution & artificial fertiliser","The discovery of America"],
       ans: 2,
-      fb: "Correct. Justus von Liebig's invention of artificial fertiliser and later the Green Revolution dramatically increased food production beyond what Malthus thought possible."
+      fb: "Justus von Liebig's invention of artificial fertiliser and later the Green Revolution dramatically increased food production beyond what Malthus thought possible."
     }
   ];
 
@@ -1189,11 +1189,21 @@
     answered = true;
     const q = questions[current];
     const btns = document.querySelectorAll('.quiz-option');
+    
     btns[idx].classList.add(idx === q.ans ? 'correct' : 'wrong');
     if (idx !== q.ans) btns[q.ans].classList.add('correct');
-    if (idx === q.ans) score++;
-    document.getElementById('quizFeedback').textContent = idx === q.ans ? '✓ ' + q.fb : '✗ ' + q.fb;
+    
+    let feedbackPrefix = "";
+    if (idx === q.ans) {
+      score++;
+      feedbackPrefix = "✓ Correct! ";
+    } else {
+      feedbackPrefix = "✗ Incorrect. ";
+    }
+    
+    document.getElementById('quizFeedback').textContent = feedbackPrefix + q.fb;
     document.getElementById('nextBtn').style.display = current < questions.length - 1 ? 'block' : 'none';
+    
     if (current === questions.length - 1) {
       setTimeout(() => {
         document.getElementById('quizProgress').textContent = '';
